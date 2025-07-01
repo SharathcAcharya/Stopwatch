@@ -3,89 +3,242 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Stopwatch</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta name="description" content="Advanced Stopwatch PWA with multiple timers, themes, and professional features">
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Stopwatch PWA">
+  <meta name="msapplication-TileColor" content="#000000">
+  
+  <title>Advanced Stopwatch PWA</title>
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Icons -->
+  <link rel="icon" href="assets/icons/icon-32x32.png" sizes="32x32">
+  <link rel="icon" href="assets/icons/icon-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/icons/icon-180x180.png">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/themes.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="js/app.js" as="script" type="module">
+  <link rel="preload" href="js/stopwatch.js" as="script" type="module">
+  
+  <!-- Font preload for better performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
   <style>
+    /* Critical CSS for initial render */
     body {
-      background-color: #000;
-      color: #fff;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--primary-bg, #000000);
+      color: var(--text-primary, #ffffff);
+      overflow-x: hidden;
     }
-    .stopwatch {
-      background: radial-gradient(circle, #1a1a1a, #000);
-      border-radius: 50%;
-      width: 300px;
-      height: 300px;
-      margin: 50px auto;
-      padding: 20px;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-      position: relative;
-      border: 2px solid #333;
-    }
-    h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-top: 30px;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    }
-    #display {
-      font-size: 36px;
-      text-align: center;
-      margin: 20px 0;
-      font-family: 'Digital-7', monospace;
-      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-      animation: glow 1.5s ease-in-out infinite alternate;
-    }
-    .buttons {
+    
+    /* Loading screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--primary-bg, #000000);
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      gap: 10px;
-      flex-wrap: wrap;
+      z-index: 9999;
+      transition: opacity 0.5s ease;
     }
-    button {
-      background: linear-gradient(145deg, #333, #222);
-      color: #fff;
-      border: none;
-      padding: 8px 15px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    
+    .loading-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid var(--border-color, #333333);
+      border-top: 4px solid var(--accent-color, #00ffff);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
-    button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
-    #laps {
-      max-height: 150px;
-      overflow-y: auto;
-      list-style: none;
-      padding: 0;
-      margin: 20px auto;
-      width: 80%;
-      color: #fff;
+    
+    .loading-text {
+      color: var(--text-secondary, #cccccc);
+      font-size: 18px;
+      margin-top: 10px;
     }
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #0ff;
-      }
-      to {
-        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #0ff;
-      }
+    
+    /* Hide loading screen when app loads */
+    .app-loaded .loading-screen {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    /* Initial stopwatch container for compatibility */
+    .stopwatch {
+      display: none; /* Will be shown by app.js */
     }
   </style>
 </head>
 <body>
-  <div class="stopwatch">
-    <h1>Stopwatch</h1>
-    <div id="display">00:00:00</div>
-    <div class="buttons">
-      <button id="start">Start</button>
-      <button id="pause">Pause</button>
-      <button id="reset">Reset</button>
-      <button id="lap">Lap</button>
-    </div>
-    <ul id="laps"></ul>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading Advanced Stopwatch...</div>
   </div>
-  <script src="script.js"></script>
+
+  <!-- Main App Container (will be created by app.js) -->
+  <div class="app-container">
+    <header class="app-header">
+      <h1 class="app-title">Advanced Stopwatch</h1>
+      <div class="header-controls">
+        <select class="timer-mode-selector" aria-label="Timer Mode">
+          <option value="stopwatch">Stopwatch</option>
+          <option value="countdown">Countdown</option>
+          <option value="interval">Interval Timer</option>
+          <option value="pomodoro">Pomodoro</option>
+        </select>
+        <select class="theme-selector" aria-label="Theme">
+          <option value="dark">Dark</option>
+          <option value="light">Light</option>
+          <option value="neon">Neon</option>
+          <option value="minimal">Minimal</option>
+          <option value="sport">Sport</option>
+        </select>
+        <button class="settings-btn" aria-label="Settings" title="Settings">⚙️</button>
+        <button class="fullscreen-btn" aria-label="Fullscreen" title="Fullscreen">⛶</button>
+        <button class="export-btn" aria-label="Export Data" title="Export Data">📥</button>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="stopwatch">
+        <div id="display" class="timer-display" role="timer" aria-live="polite">00:00:00.00</div>
+        <div class="controls" role="group" aria-label="Timer Controls">
+          <button id="start" class="control-btn primary" data-action="start" aria-label="Start Timer">
+            <span>Start</span>
+          </button>
+          <button id="pause" class="control-btn" data-action="pause" aria-label="Pause Timer">
+            <span>Pause</span>
+          </button>
+          <button id="reset" class="control-btn" data-action="stop" aria-label="Reset Timer">
+            <span>Reset</span>
+          </button>
+          <button id="lap" class="control-btn" data-action="lap" aria-label="Record Lap">
+            <span>Lap</span>
+          </button>
+        </div>
+      </div>
+
+      <section class="lap-section" aria-label="Lap Times">
+        <div class="lap-header">
+          <h2 class="lap-title">Lap Times</h2>
+          <span class="lap-count" id="lapCount">0 laps</span>
+        </div>
+        <ul id="laps" class="lap-list" role="list" aria-label="Recorded lap times"></ul>
+      </section>
+    </main>
+  </div>
+
+  <!-- Keyboard Shortcuts Help -->
+  <div id="shortcutsHelp" class="shortcuts-help" style="display: none;">
+    <h3>Keyboard Shortcuts</h3>
+    <ul>
+      <li><kbd>Space</kbd> - Start/Pause</li>
+      <li><kbd>R</kbd> - Reset</li>
+      <li><kbd>L</kbd> - Lap</li>
+      <li><kbd>F11</kbd> - Fullscreen</li>
+      <li><kbd>Esc</kbd> - Exit Fullscreen</li>
+    </ul>
+  </div>
+
+  <!-- Service Worker Registration -->
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('SW registered: ', registration);
+          })
+          .catch((registrationError) => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+
+    // Hide loading screen when app is ready
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.body.classList.add('app-loaded');
+        setTimeout(() => {
+          const loadingScreen = document.getElementById('loadingScreen');
+          if (loadingScreen) {
+            loadingScreen.remove();
+          }
+        }, 500);
+      }, 1000);
+    });
+
+    // Handle install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Show install button
+      const installBtn = document.createElement('button');
+      installBtn.className = 'install-btn';
+      installBtn.textContent = '📱 Install App';
+      installBtn.onclick = async () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log('Install outcome:', outcome);
+          deferredPrompt = null;
+          installBtn.remove();
+        }
+      };
+      
+      const header = document.querySelector('.header-controls');
+      if (header) {
+        header.appendChild(installBtn);
+      }
+    });
+
+    // Performance monitoring
+    window.addEventListener('load', () => {
+      if ('performance' in window) {
+        const perfData = performance.getEntriesByType('navigation')[0];
+        console.log('Performance metrics:', {
+          loadTime: perfData.loadEventEnd - perfData.loadEventStart,
+          domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+          firstPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-paint')?.startTime,
+          firstContentfulPaint: performance.getEntriesByType('paint').find(p => p.name === 'first-contentful-paint')?.startTime
+        });
+      }
+    });
+  </script>
+
+  <!-- Main Application Script -->
+  <script type="module" src="js/app.js"></script>
+  
+  <!-- Fallback for older browsers -->
+  <script nomodule>
+    console.warn('This browser does not support ES modules. Please upgrade to a modern browser.');
+    document.body.innerHTML = '<div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;"><h2>Browser Not Supported</h2><p>Please upgrade to a modern browser to use this application.</p></div>';
+  </script>
 </body>
 </html>

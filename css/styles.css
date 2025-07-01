@@ -1,0 +1,342 @@
+/* Main Styles - Modern Stopwatch PWA */
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--primary-bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Main Container */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: var(--spacing-md);
+}
+
+/* Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md) 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--spacing-xl);
+}
+
+.app-title {
+  font-size: var(--font-2xl);
+  font-weight: 700;
+  color: var(--text-accent);
+  text-shadow: 0 0 10px var(--glow-color);
+}
+
+.theme-selector, .timer-mode-selector {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--secondary-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--animation-fast) ease;
+}
+
+.theme-selector:hover, .timer-mode-selector:hover {
+  background: var(--tertiary-bg);
+  border-color: var(--accent-color);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) 0;
+}
+
+/* Stopwatch Container */
+.stopwatch {
+  position: relative;
+  width: min(90vw, 400px);
+  height: min(90vw, 400px);
+  max-width: 400px;
+  max-height: 400px;
+  background: radial-gradient(circle, var(--secondary-bg), var(--primary-bg));
+  border: 3px solid var(--border-color);
+  border-radius: var(--radius-full);
+  box-shadow: 
+    0 0 30px var(--shadow-color),
+    inset 0 0 30px var(--shadow-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+
+.stopwatch::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  right: -5px;
+  bottom: -5px;
+  border: 2px solid var(--accent-color);
+  border-radius: var(--radius-full);
+  opacity: 0.3;
+}
+
+.stopwatch.running {
+  border-color: #00ff00;
+  box-shadow: 
+    0 0 40px var(--glow-color),
+    inset 0 0 20px var(--shadow-color);
+}
+
+.stopwatch.running::before {
+  opacity: 0.8;
+  animation: pulse 2s infinite;
+}
+
+/* Timer Display */
+.timer-display {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-size: clamp(2rem, 8vw, 4rem);
+  font-weight: 300;
+  color: var(--text-primary);
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+  text-shadow: 0 0 20px var(--glow-color);
+  user-select: none;
+  letter-spacing: 0.1em;
+}
+
+.timer-display.running {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+.milliseconds {
+  font-size: 0.6em;
+  opacity: 0.8;
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  gap: var(--spacing-md);
+  margin: var(--spacing-xl) 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.control-btn {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--button-bg);
+  color: var(--text-primary);
+  font-size: var(--font-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--animation-fast) ease;
+  min-width: 80px;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.control-btn:hover {
+  background: var(--button-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.control-btn:active {
+  transform: translateY(0);
+}
+
+.control-btn:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.control-btn.primary {
+  background: linear-gradient(145deg, var(--accent-color), var(--glow-color));
+  color: var(--primary-bg);
+  font-weight: 600;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Lap Times */
+.lap-section {
+  width: 100%;
+  max-width: 500px;
+  margin-top: var(--spacing-xl);
+}
+
+.lap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding: 0 var(--spacing-md);
+}
+
+.lap-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  color: var(--text-accent);
+}
+
+.lap-count {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.lap-list {
+  list-style: none;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) var(--secondary-bg);
+}
+
+.lap-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.lap-list::-webkit-scrollbar-track {
+  background: var(--secondary-bg);
+}
+
+.lap-list::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: var(--radius-sm);
+}
+
+.lap-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  background: var(--lap-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  transition: all var(--animation-fast) ease;
+}
+
+.lap-item:hover {
+  background: var(--lap-hover);
+  transform: translateX(4px);
+}
+
+.lap-number {
+  font-weight: 600;
+  color: var(--accent-color);
+  min-width: 60px;
+}
+
+.lap-time {
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+  font-weight: 500;
+}
+
+.lap-split {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    text-align: center;
+  }
+  
+  .controls {
+    gap: var(--spacing-sm);
+  }
+  
+  .control-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-width: 70px;
+    font-size: var(--font-sm);
+  }
+  
+  .lap-item {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .stopwatch {
+    width: min(95vw, 300px);
+    height: min(95vw, 300px);
+  }
+  
+  .controls {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .control-btn {
+    width: 100%;
+  }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .timer-display {
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .app-header,
+  .controls {
+    display: none;
+  }
+  
+  .stopwatch {
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+  
+  .lap-list {
+    max-height: none;
+  }
+}
