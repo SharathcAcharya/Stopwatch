@@ -92,42 +92,55 @@ class StopwatchApp {
    * Initialize DOM elements
    */
   initializeDOM() {
-    // Get existing elements
+    // Get existing elements or create new ones
     this.elements = {
-      timerDisplay: document.getElementById('display') || this.createElement('div', 'timer-display'),
-      controls: document.querySelector('.controls') || this.createElement('div', 'controls'),
-      lapList: document.getElementById('laps') || this.createElement('ul', 'lap-list'),
+      timerDisplay: document.getElementById('display'),
+      controls: document.querySelector('.controls'),
+      lapList: document.getElementById('laps'),
       
-      // Create new elements for enhanced features
-      modeSelector: this.createElement('select', 'timer-mode-selector'),
-      themeSelector: this.createElement('select', 'theme-selector'),
-      settingsBtn: this.createElement('button', 'settings-btn'),
-      fullscreenBtn: this.createElement('button', 'fullscreen-btn'),
-      exportBtn: this.createElement('button', 'export-btn'),
+      // These will be found or created in updateDocumentStructure
+      modeSelector: null,
+      themeSelector: null,
+      settingsBtn: null,
+      fullscreenBtn: null,
+      exportBtn: null,
       
-      // Modal elements
+      // Modal elements (will be created)
       settingsModal: this.createElement('div', 'settings-modal'),
       exportModal: this.createElement('div', 'export-modal')
     };
 
+    // Ensure core elements exist
+    if (!this.elements.timerDisplay) {
+      this.elements.timerDisplay = this.createElement('div', 'timer-display');
+      this.elements.timerDisplay.id = 'display';
+    }
+    
+    if (!this.elements.controls) {
+      this.elements.controls = this.createElement('div', 'controls');
+    }
+    
+    if (!this.elements.lapList) {
+      this.elements.lapList = this.createElement('ul', 'lap-list');
+      this.elements.lapList.id = 'laps';
+    }
+
     // Setup timer display
     this.elements.timerDisplay.textContent = '00:00:00.00';
     this.elements.timerDisplay.classList.add('timer-display');
+    
+    // Update document structure (this will handle selectors and buttons)
+    this.updateDocumentStructure();
 
-    // Setup mode selector
+    // Setup selectors after structure is ready
     this.setupModeSelector();
-    
-    // Setup theme selector
     this.setupThemeSelector();
-    
-    // Setup control buttons
+
+    // Setup control buttons after structure is ready
     this.setupControlButtons();
     
     // Setup modals
     this.setupModals();
-    
-    // Update document structure if needed
-    this.updateDocumentStructure();
   }
 
   /**
@@ -148,6 +161,11 @@ class StopwatchApp {
    * Setup mode selector
    */
   setupModeSelector() {
+    if (!this.elements.modeSelector) return;
+    
+    // Clear existing options if any
+    this.elements.modeSelector.innerHTML = '';
+    
     const modes = [
       { value: 'stopwatch', label: 'Stopwatch' },
       { value: 'countdown', label: 'Countdown' },
@@ -169,6 +187,11 @@ class StopwatchApp {
    * Setup theme selector
    */
   setupThemeSelector() {
+    if (!this.elements.themeSelector) return;
+    
+    // Clear existing options if any
+    this.elements.themeSelector.innerHTML = '';
+    
     const themes = themeManager.getAvailableThemes();
     
     Object.entries(themes).forEach(([key, theme]) => {
@@ -286,44 +309,59 @@ class StopwatchApp {
    * Update document structure for modern layout
    */
   updateDocumentStructure() {
-    // Check if we need to restructure the document
-    let appContainer = document.querySelector('.app-container');
-    if (!appContainer) {
-      // Create modern structure
-      appContainer = this.createElement('div', 'app-container');
+    // Check if structure already exists (from HTML)
+    const appContainer = document.querySelector('.app-container');
+    if (appContainer) {
+      // Structure already exists, just get element references
+      this.elements.modeSelector = document.querySelector('.timer-mode-selector');
+      this.elements.themeSelector = document.querySelector('.theme-selector');
+      this.elements.settingsBtn = document.querySelector('.settings-btn');
+      this.elements.fullscreenBtn = document.querySelector('.fullscreen-btn');
+      this.elements.exportBtn = document.querySelector('.export-btn');
       
-      const header = this.createElement('header', 'app-header');
-      header.innerHTML = `
-        <h1 class="app-title">Advanced Stopwatch</h1>
-        <div class="header-controls">
-          <select class="timer-mode-selector"></select>
-          <select class="theme-selector"></select>
-          <button class="settings-btn">⚙️</button>
-          <button class="fullscreen-btn">⛶</button>
-          <button class="export-btn">📥</button>
-        </div>
-      `;
+      // Show the stopwatch that was hidden by CSS
+      const stopwatch = document.querySelector('.stopwatch');
+      if (stopwatch) {
+        stopwatch.style.display = 'flex';
+      }
       
-      const mainContent = this.createElement('main', 'main-content');
-      const stopwatchContainer = document.querySelector('.stopwatch') || this.createElement('div', 'stopwatch');
-      
-      // Move existing content
-      mainContent.appendChild(stopwatchContainer);
-      
-      appContainer.appendChild(header);
-      appContainer.appendChild(mainContent);
-      
-      // Replace body content
-      document.body.innerHTML = '';
-      document.body.appendChild(appContainer);
-      
-      // Update element references
-      this.elements.modeSelector = header.querySelector('.timer-mode-selector');
-      this.elements.themeSelector = header.querySelector('.theme-selector');
-      this.elements.settingsBtn = header.querySelector('.settings-btn');
-      this.elements.fullscreenBtn = header.querySelector('.fullscreen-btn');
-      this.elements.exportBtn = header.querySelector('.export-btn');
+      return;
     }
+    
+    // If no structure exists, create it (legacy fallback)
+    const newAppContainer = this.createElement('div', 'app-container');
+    
+    const header = this.createElement('header', 'app-header');
+    header.innerHTML = `
+      <h1 class="app-title">Advanced Stopwatch</h1>
+      <div class="header-controls">
+        <select class="timer-mode-selector"></select>
+        <select class="theme-selector"></select>
+        <button class="settings-btn">⚙️</button>
+        <button class="fullscreen-btn">⛶</button>
+        <button class="export-btn">📥</button>
+      </div>
+    `;
+    
+    const mainContent = this.createElement('main', 'main-content');
+    const stopwatchContainer = document.querySelector('.stopwatch') || this.createElement('div', 'stopwatch');
+    
+    // Move existing content
+    mainContent.appendChild(stopwatchContainer);
+    
+    newAppContainer.appendChild(header);
+    newAppContainer.appendChild(mainContent);
+    
+    // Replace body content
+    document.body.innerHTML = '';
+    document.body.appendChild(newAppContainer);
+    
+    // Update element references
+    this.elements.modeSelector = header.querySelector('.timer-mode-selector');
+    this.elements.themeSelector = header.querySelector('.theme-selector');
+    this.elements.settingsBtn = header.querySelector('.settings-btn');
+    this.elements.fullscreenBtn = header.querySelector('.fullscreen-btn');
+    this.elements.exportBtn = header.querySelector('.export-btn');
   }
 
   /**
@@ -331,22 +369,34 @@ class StopwatchApp {
    */
   setupEventListeners() {
     // Control button events
-    this.elements.controls.addEventListener('click', this.handleControlClick.bind(this));
+    if (this.elements.controls) {
+      this.elements.controls.addEventListener('click', this.handleControlClick.bind(this));
+    }
     
     // Mode selector
-    this.elements.modeSelector.addEventListener('change', this.handleModeChange.bind(this));
+    if (this.elements.modeSelector) {
+      this.elements.modeSelector.addEventListener('change', this.handleModeChange.bind(this));
+    }
     
     // Theme selector
-    this.elements.themeSelector.addEventListener('change', this.handleThemeChange.bind(this));
+    if (this.elements.themeSelector) {
+      this.elements.themeSelector.addEventListener('change', this.handleThemeChange.bind(this));
+    }
     
     // Settings button
-    this.elements.settingsBtn.addEventListener('click', () => this.showModal('settings'));
+    if (this.elements.settingsBtn) {
+      this.elements.settingsBtn.addEventListener('click', () => this.showModal('settings'));
+    }
     
     // Fullscreen button
-    this.elements.fullscreenBtn.addEventListener('click', this.toggleFullscreen.bind(this));
+    if (this.elements.fullscreenBtn) {
+      this.elements.fullscreenBtn.addEventListener('click', this.toggleFullscreen.bind(this));
+    }
     
     // Export button
-    this.elements.exportBtn.addEventListener('click', () => this.showModal('export'));
+    if (this.elements.exportBtn) {
+      this.elements.exportBtn.addEventListener('click', () => this.showModal('export'));
+    }
     
     // Modal events
     document.addEventListener('click', this.handleModalClick.bind(this));
@@ -357,12 +407,7 @@ class StopwatchApp {
     window.addEventListener('beforeunload', this.handlers.beforeunload);
     
     // Stopwatch events
-    this.stopwatch.addEventListener('update', this.handleStopwatchUpdate.bind(this));
-    this.stopwatch.addEventListener('start', this.handleStopwatchStart.bind(this));
-    this.stopwatch.addEventListener('pause', this.handleStopwatchPause.bind(this));
-    this.stopwatch.addEventListener('stop', this.handleStopwatchStop.bind(this));
-    this.stopwatch.addEventListener('lap', this.handleStopwatchLap.bind(this));
-    this.stopwatch.addEventListener('complete', this.handleStopwatchComplete.bind(this));
+    this.setupStopwatchEventListeners();
   }
 
   /**

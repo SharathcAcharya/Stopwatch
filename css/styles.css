@@ -340,3 +340,26 @@ body {
     max-height: none;
   }
 }
+/* Quick CSS fix to show stopwatch */
+.stopwatch {
+  display: flex !important;
+  background: radial-gradient(circle, #1a1a1a, #000000) !important;
+  border: 3px solid #333333 !important;
+  color: #ffffff !important;
+}
+
+.timer-display {
+  color: #ffffff !important;
+  font-size: 3rem !important;
+}
+
+.control-btn {
+  background: linear-gradient(145deg, #333333, #222222) !important;
+  color: #ffffff !important;
+  border: none !important;
+  padding: 1rem 1.5rem !important;
+  border-radius: 1rem !important;
+  cursor: pointer !important;
+  margin: 0.5rem !important;
+}
+
