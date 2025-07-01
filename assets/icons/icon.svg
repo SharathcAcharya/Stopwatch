@@ -1,0 +1,11 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+  <circle cx='50' cy='50' r='45' fill='#000' stroke='#00ffff' stroke-width='3'/>
+  <circle cx='50' cy='50' r='30' fill='none' stroke='#00ffff' stroke-width='2'/>
+  <line x1='50' y1='20' x2='50' y2='35' stroke='#00ffff' stroke-width='2'/>
+  <line x1='50' y1='65' x2='50' y2='80' stroke='#00ffff' stroke-width='2'/>
+  <line x1='20' y1='50' x2='35' y2='50' stroke='#00ffff' stroke-width='2'/>
+  <line x1='65' y1='50' x2='80' y2='50' stroke='#00ffff' stroke-width='2'/>
+  <line x1='50' y1='50' x2='50' y2='25' stroke='#fff' stroke-width='3'/>
+  <line x1='50' y1='50' x2='70' y2='50' stroke='#fff' stroke-width='2'/>
+  <circle cx='50' cy='50' r='3' fill='#fff'/>
+</svg>
